@@ -32,7 +32,7 @@ function App() {
     newPrice: '0.0'
   });
   const marketplaceAddress = "0x27d18778137CCF9836ccff60517949b81132AE22";
-  const nftContractAddress = "0xd46B7F5C4Ad7320aD20046CEf5d154B8f70a52e8";
+  const nftContractAddress = "0xd8E46D75B5f4b450534acA1804f1CfcbeDEA3772";
   const web3 = new Web3(window.ethereum);
 
 
@@ -41,7 +41,7 @@ function App() {
     return Math.floor(Date.now() / 1000);
   }
 
-  async function connectWallet() {
+  const connectWallet = async () => {
     if(window.ethereum) {
       try {
         const accounts = await web3.eth.getAccounts();
@@ -92,7 +92,7 @@ function App() {
                 ],
             },
             domain: {
-                name: await nftContract.methods.name().call(),
+                name: "ERC404Token",
                 version: "1",
                 chainId: 80001,
                 verifyingContract: nftContractAddress
@@ -111,7 +111,7 @@ function App() {
         const signature = await new Promise((resolve, reject) => {
             web3.currentProvider.sendAsync(
                 {
-                    method: "eth_signTypedData_v3",
+                    method: "eth_signTypedData_v4",
                     params: [account, msgData],
                     from: account
                 },
@@ -126,9 +126,7 @@ function App() {
         });
 
         // Extract r, s, and v components from the signature
-        const r = "0x" + signature.substring(2, 66);
-        const s = "0x" + signature.substring(66, 130);
-        const v = parseInt(signature.substring(130, 132), 16);
+        const {r, s, v} = await ethers.utils.splitSignature(signature);
 
         console.log(r, s, v);
 

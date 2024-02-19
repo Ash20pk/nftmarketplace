@@ -47,7 +47,7 @@ contract NFTMintDN404 is DN404, ERC20Permit, Ownable{
         uint120 publicPrice_,
         uint96 initialTokenSupply,
         address initialSupplyOwner
-    ) ERC20Permit("NFTMintDN404") {
+    ) ERC20Permit("ERC404Token") {
         _initializeOwner(msg.sender);
 
         _name = name_;
