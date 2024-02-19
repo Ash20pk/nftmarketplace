@@ -2,13 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { ethers } from 'ethers';
 import NFTMarketplaceABI from './contracts/NFTMarketplace.json';
 import NFTMintDN404 from './contracts/NFTMintDN404.json';
-import { signERC2612Permit } from 'eth-permit';
 import Web3 from 'web3';
 
 function App() {
-  const [provider, setProvider] = useState(null);
   const [signer, setSigner] = useState(null);
-  const [contract, setContract] = useState(null);
   const [nftContract, setNftContract] = useState(null);
   const [account, setAccount] = useState(null);
   const [marketplaceContract, setMarketplaceContract] = useState(null);
@@ -31,7 +28,7 @@ function App() {
     nftAddress: '',
     newPrice: '0.0'
   });
-  const marketplaceAddress = "0x27d18778137CCF9836ccff60517949b81132AE22";
+  const marketplaceAddress = "0x0Abef8EDAC7A1be16F8A5595f71c14dc395A0773";
   const nftContractAddress = "0xd8E46D75B5f4b450534acA1804f1CfcbeDEA3772";
   const web3 = new Web3(window.ethereum);
 
@@ -131,7 +128,7 @@ function App() {
         console.log(r, s, v);
 
         // Call permit function with the signature components
-        await nftContract.methods.permit(account, marketplaceAddress, listNFTData.amount, deadline, v, r, s).send();
+        await marketplaceContract.methods.listItemWithPermit(nftContractAddress, account, marketplaceAddress, listNFTData.amount, deadline, priceInWei, v, r, s).send();
 
     } catch (error) {
         console.error(error);
@@ -140,7 +137,7 @@ function App() {
 
   const cancelListing = async () => {
     try {
-      await contract.cancelListing(nftContract.address);
+      await marketplaceContract.methods.cancelListing(cancelListingData.nftAddress);
     } catch (error) {
       console.error(error);
     }
@@ -148,11 +145,14 @@ function App() {
 
   const buyNFT = async () => {
     try {
-      await marketplaceContract.buyItem(
-        buyNFTData.nftAddress,
-        buyNFTData.fraction,
-        { value: ethers.utils.parseEther(buyNFTData.price) }
-      );
+      await marketplaceContract.methods.buyItem(
+        buyNFTData.nftAddress, 
+        buyNFTData.fraction
+      )
+      .send({ 
+        from: account,
+        value: web3.utils.toWei(buyNFTData.price, 'ether') 
+    });
     } catch (error) {
       console.error(error);
     }
@@ -160,10 +160,26 @@ function App() {
 
   const updateListingPrice = async () => {
     try {
-      await marketplaceContract.updateListing(
+      await marketplaceContract.methods.updateListing(
         updateListingData.nftAddress,
         ethers.utils.parseEther(updateListingData.newPrice)
       );    
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const getProceeds = async () => {
+    try {
+      await marketplaceContract.medthods.getProceeds(account);    
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const getListings = async () => {
+    try {
+      await marketplaceContract.medthods.getListings(nftContractAddress);    
     } catch (error) {
       console.error(error);
     }

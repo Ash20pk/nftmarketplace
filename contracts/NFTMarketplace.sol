@@ -41,7 +41,6 @@ contract NFTMarketplace is Context {
         uint256 fraction
     );
 
-
     // State Variables
     mapping(address => Listing) private s_listings;
     mapping(address => uint256) private s_proceeds;
@@ -68,17 +67,19 @@ contract NFTMarketplace is Context {
 
     function listItemWithPermit(
         address nftAddress,
-        uint256 amount, 
-        uint256 price,
+        address owner,
+        address spender,
+        uint256 amount,
         uint256 deadline,
+        uint256 price,
         uint8 v, bytes32 r, bytes32 s   
         ) external notListed(nftAddress) {
             
         IDN404 nft = IDN404(nftAddress);
 
-        nft.permit(_msgSender(), address(this), amount, deadline, v, r, s);
+        nft.permit(owner, spender, amount, deadline, v, r, s);
 
-        if(nft.allowance(_msgSender(), address(this)) < amount){
+        if(nft.allowance(owner, spender) < amount){
             revert NotApproved();
         }
 
