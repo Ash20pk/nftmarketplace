@@ -1,9 +1,14 @@
 {
   "dependencies": {
     "@openzeppelin/contracts": "^5.0.1",
-    "hardhat": "^2.19.5"
+    "chai": "^4.4.1",
+    "dn404": "^0.0.2",
+    "dotenv": "^16.4.4",
+    "hardhat": "^2.19.5",
+    "solady": "^0.0.168"
   },
   "devDependencies": {
-    "@nomicfoundation/hardhat-toolbox": "^4.0.0"
+    "@nomicfoundation/hardhat-toolbox": "^4.0.0",
+    "@nomicfoundation/hardhat-verify": "^2.0.4"
   }
 }

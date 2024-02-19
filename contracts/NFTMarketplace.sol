@@ -1,167 +1,156 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.20;
 
-import "./lib/Interface/IERC404.sol";
+import "./Interface/IDN404.sol";
+import "@openzeppelin/contracts/utils/Context.sol";
 
-error PriceNotMet(address nftAddress, uint256 tokenId, uint256 price);
-error ItemNotForSale(address nftAddress, uint256 tokenId);
-error NotListed(address nftAddress, uint256 tokenId);
-error AlreadyListed(address nftAddress, uint256 tokenId);
+error PriceNotMet(address nftAddress, uint256 price);
+error ItemNotForSale(address nftAddress);
+error NotListed(address nftAddress);
+error AlreadyListed(address nftAddress);
 error NoProceeds();
 error NotOwner();
 error NotApprovedForMarketplace();
 error PriceMustBeAboveZero();
+error NotApproved();
 
-contract NFTMarketplace {
-   
+contract NFTMarketplace is Context {
+
+    uint256 private counter;
+
     struct Listing {
         uint256 price;
         address seller;
     }
 
-   event ItemListed(
+    event LogItemListed(
         address indexed seller,
         address indexed nftAddress,
-        uint256 indexed tokenId,
         uint256 price
     );
 
-    event ItemCanceled(
+    event LogItemCanceled(
         address indexed seller,
-        address indexed nftAddress,
-        uint256 indexed tokenId
+        address indexed nftAddress
     );
 
-    event ItemBought(
-            address indexed buyer,
-            address indexed nftAddress,
-            uint256 indexed tokenId,
-            uint256 price
-        );
+    event LogItemBought(
+        address indexed buyer,
+        address indexed nftAddress,
+        uint256 price,
+        uint256 fraction
+    );
 
 
-   // State Variables
-   mapping(address => mapping(uint256 => Listing)) private s_listings;
-   mapping(address => uint256) private s_proceeds;
+    // State Variables
+    mapping(address => Listing) private s_listings;
+    mapping(address => uint256) private s_proceeds;
 
-   // Function modifiers
-   modifier notListed(
-        address nftAddress,
-        uint256 tokenId,
-        address owner
-   ) {
-        Listing memory listing = s_listings[nftAddress][tokenId];
-        if (listing.price > 0) {
-            revert AlreadyListed(nftAddress, tokenId);
-        }
+
+    // Function modifiers
+    modifier isListed(address nftAddress) {
+        Listing memory listing = s_listings[nftAddress];
+        require(listing.price > 0, "Not listed");
         _;
     }
 
-    modifier isOwner(
-        address nftAddress,
-        uint256 tokenId,
-        address spender
-    ) {
-        IERC404 nft = IERC404(nftAddress);
-        address owner = nft.ownerOf(tokenId);
-        if (spender != owner) {
-            revert NotOwner();
-        }
+    modifier notListed(address nftAddress) {
+        Listing memory listing = s_listings[nftAddress];
+        require(listing.price == 0, "Already listed");
         _;
     }
 
-    function listItem(
-            address nftAddress,
-            uint256 tokenId,
-            uint256 price
-        )
-            external
-            notListed(nftAddress, tokenId, msg.sender)
-            isOwner(nftAddress, tokenId, msg.sender)
-        {
-            if (price <= 0) {
-                revert PriceMustBeAboveZero();
-            }
-            IERC404 nft = IERC404(nftAddress);
-            if (nft.getApproved(tokenId) != address(this)) {
-                revert NotApprovedForMarketplace();
-            }
-            s_listings[nftAddress][tokenId] = Listing(price, msg.sender);
-            emit ItemListed(msg.sender, nftAddress, tokenId, price);
+    modifier isOwner(address nftAddress, address spender) {
+        IDN404 nft = IDN404(nftAddress);
+        require(nft.balanceOf(spender) > 0, "Not owner");
+        _;
+    }
+
+    function listItemWithPermit(
+        address nftAddress,
+        uint256 amount, 
+        uint256 price,
+        uint256 deadline,
+        uint8 v, bytes32 r, bytes32 s   
+        ) external notListed(nftAddress) {
+            
+        IDN404 nft = IDN404(nftAddress);
+
+        nft.permit(_msgSender(), address(this), amount, deadline, v, r, s);
+
+        if(nft.allowance(_msgSender(), address(this)) < amount){
+            revert NotApproved();
         }
 
-    function cancelListing(address nftAddress, uint256 tokenId)
-            external
-            isOwner(nftAddress, tokenId, msg.sender)
-            isListed(nftAddress, tokenId)
-        {
-            delete (s_listings[nftAddress][tokenId]);
-            emit ItemCanceled(msg.sender, nftAddress, tokenId);
-        }
+        // Store the listing information
+        s_listings[nftAddress] = Listing(price, _msgSender());
 
-    modifier isListed(address nftAddress, uint256 tokenId) {
-            Listing memory listing = s_listings[nftAddress][tokenId];
-            if (listing.price <= 0) {
-                revert NotListed(nftAddress, tokenId);
-            }
-            _;
-        }
+        // Emit event
+        emit LogItemListed(_msgSender(), nftAddress, price);
 
+        counter++;
+    }
 
-    function buyItem(address nftAddress, uint256 tokenId)
-            external
-            payable
-            isListed(nftAddress, tokenId)
-        {
-            Listing memory listedItem = s_listings[nftAddress][tokenId];
-            if (msg.value < listedItem.price) {
-                revert PriceNotMet(nftAddress, tokenId, listedItem.price);
-            }
+    function cancelListing(address nftAddress)
+        external
+        isOwner(nftAddress, _msgSender())
+        isListed(nftAddress)
+    {
+        delete s_listings[nftAddress];
+        emit LogItemCanceled(_msgSender(), nftAddress);
+    }
 
-            s_proceeds[listedItem.seller] += msg.value;
-            delete (s_listings[nftAddress][tokenId]);
-            IERC404(nftAddress).safeTransferFrom(listedItem.seller, msg.sender, tokenId);
-            emit ItemBought(msg.sender, nftAddress, tokenId, listedItem.price);
-        }
+    function buyItem(address nftAddress, uint256 fraction)
+        external
+        payable
+        isListed(nftAddress)
+    {
+        Listing memory listedItem = s_listings[nftAddress];
+        require(msg.value >= listedItem.price, "Price not met");
+
+        s_proceeds[listedItem.seller] += msg.value;
+        delete s_listings[nftAddress];
+        IDN404(nftAddress).transferFrom(listedItem.seller, _msgSender(), fraction);
+        emit LogItemBought(_msgSender(), nftAddress, listedItem.price, fraction);
+    }
 
     function updateListing(
         address nftAddress,
-        uint256 tokenId,
         uint256 newPrice
     )
         external
-        isListed(nftAddress, tokenId)
-        isOwner(nftAddress, tokenId, msg.sender)
+        isListed(nftAddress)
+        isOwner(nftAddress, _msgSender())
     {
-        if (newPrice == 0) {
-            revert PriceMustBeAboveZero();
-        }
+        require(newPrice > 0, "Price must be above zero");
 
-        s_listings[nftAddress][tokenId].price = newPrice;
-        emit ItemListed(msg.sender, nftAddress, tokenId, newPrice);
+        s_listings[nftAddress].price = newPrice;
+        emit LogItemListed(_msgSender(), nftAddress, newPrice);
     }
 
     function withdrawProceeds() external {
-        uint256 proceeds = s_proceeds[msg.sender];
-        if (proceeds <= 0) {
-            revert NoProceeds();
-        }
-        s_proceeds[msg.sender] = 0;
+        uint256 proceeds = s_proceeds[_msgSender()];
+        require(proceeds > 0, "No proceeds");
+        s_proceeds[_msgSender()] = 0;
 
-        (bool success, ) = payable(msg.sender).call{value: proceeds}("");
+        (bool success, ) = payable(_msgSender()).call{value: proceeds}("");
         require(success, "Transfer failed");
     }
 
-    function getListing(address nftAddress, uint256 tokenId)
+    function getListing(address nftAddress)
         external
         view
         returns (Listing memory)
     {
-        return s_listings[nftAddress][tokenId];
+        return s_listings[nftAddress];
     }
 
     function getProceeds(address seller) external view returns (uint256) {
         return s_proceeds[seller];
     }
 
+    function numListings() external view returns (uint256) {
+        return counter;
+    }
 }
+
