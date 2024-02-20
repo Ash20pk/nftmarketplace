@@ -1,5 +1,6 @@
 import React from 'react';
 import { ethers } from 'ethers';
+import '../styles/UpdateListingPrice.css';
 
 
 function UpdateListingPrice({ updateListingData, setUpdateListingData, marketplaceContract }) {
@@ -15,7 +16,7 @@ function UpdateListingPrice({ updateListingData, setUpdateListingData, marketpla
   };
 
   return (
-    <div>
+    <div className='update-listing-container'>
       <h2>Update Listing Price</h2>
         <input
           type="text"

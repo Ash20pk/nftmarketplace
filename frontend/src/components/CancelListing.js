@@ -1,4 +1,5 @@
 import React from 'react';
+import '../styles/CancelListing.css';
 
 function CancelListing({ cancelListingData, setCancelListingData, marketplaceContract }) {
   const cancelListing = async () => {
@@ -10,7 +11,7 @@ function CancelListing({ cancelListingData, setCancelListingData, marketplaceCon
   };
 
   return (
-    <div>
+    <div className='cancel-listing-container'>
     <h2>Cancel Listing</h2>
         <input
           type="text"

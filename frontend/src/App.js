@@ -4,6 +4,8 @@ import ListNFTWithPermit from './components/ListNFTWithPermit';
 import CancelListing from './components/CancelListing';
 import BuyNFT from './components/BuyNFT';
 import UpdateListingPrice from './components/UpdateListingPrice';
+import Navigation from './components/Navigation';
+import './App.css'
 
 function App() {
   const {nftContract, account, marketplaceContract, web3 } = useWeb3();
@@ -30,7 +32,8 @@ function App() {
 
   return (
     <div>
-      <div>Account: {account}</div>
+      <Navigation />
+      <div className='account-info'>Account: {account}</div>
       <ListNFTWithPermit
         listNFTData={listNFTData}
         setListNFTData={setListNFTData}

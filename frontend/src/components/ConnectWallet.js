@@ -1,7 +1,7 @@
 import React, { useEffect, useState, createContext, useContext } from 'react';
 import Web3 from 'web3';
 import NFTMintDN404 from '../contracts/NFTMintDN404.json';
-import NFTMarketplaceABI from '../contracts/NFTMarketplace.json'
+import NFTMarketplaceABI from '../contracts/NFTMarketplace.json';
 
 // Create a context for Web3
 const Web3Context = createContext();
@@ -46,10 +46,15 @@ function ConnectWallet({ children }) {
     }
   };
 
+  const disconnectWallet = () => {
+    setAccount(null);
+    setMarketplaceContract(null); 
+    setNftContract(null);
+  };
+
   return (
-    <Web3Context.Provider value={{ web3, signer, nftContract, account, marketplaceContract, marketplaceAddress, nftContractAddress }}>
+    <Web3Context.Provider value={{ web3, signer, nftContract, account, marketplaceContract, marketplaceAddress, nftContractAddress, disconnectWallet, connectWallet }}>
       <div>
-        <button onClick={connectWallet}>Connect Wallet</button>
         {children}
       </div>
     </Web3Context.Provider>

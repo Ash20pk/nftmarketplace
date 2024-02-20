@@ -1,4 +1,5 @@
 import React from 'react';
+import '../styles/BuyNFT.css';
 
 function BuyNFT({ buyNFTData, setBuyNFTData, account, marketplaceContract, web3 }) {
   const buyNFT = async () => {
@@ -17,7 +18,7 @@ function BuyNFT({ buyNFTData, setBuyNFTData, account, marketplaceContract, web3 
   };
 
   return (
-    <div>
+    <div className='buy-nft-container'>
        <h2>Buy NFT</h2>
         <input
           type="text"

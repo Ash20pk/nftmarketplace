@@ -103,3 +103,16 @@ body {
   text-align: center;
   padding: 20px 0;
 }
+
+.app-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.account-info {
+  margin-top: 20px;
+  font-size: 1.2rem;
+  font-weight: bold;
+  padding-bottom: 5px;
+}

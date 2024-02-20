@@ -1,6 +1,8 @@
 import React from 'react';
 import { ethers } from 'ethers';
 import { useWeb3 } from './ConnectWallet'; // Import the useWeb3 hook to access web3 instance and other context variables
+import '../styles/ListNFTWithPermit.css'; // Import CSS file for styling
+
 
 function ListNFTWithPermit({ listNFTData, setListNFTData }) {
   const { web3, account, marketplaceContract, nftContract, marketplaceAddress, nftContractAddress } = useWeb3(); // Destructure variables from the Web3 context
@@ -84,8 +86,8 @@ function ListNFTWithPermit({ listNFTData, setListNFTData }) {
   };
 
   return (
-    <div>
-      <h2>List NFT with Permit</h2>
+    <div className="list-nft-container">
+      <h2>List NFT</h2>
       <input
         type="text"
         placeholder="NFT Address"

@@ -1,0 +1,41 @@
+.update-listing-container {
+    margin: 20px;
+    padding: 20px;
+    background-color: #f0f0f0;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.update-listing-container h2 {
+    font-size: 1.5rem;
+    margin-bottom: 15px;
+}
+
+.update-listing-container input[type="text"] {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.update-listing-container input[type="text"]:focus {
+    outline: none;
+    border-color: #4CAF50;
+}
+
+.update-listing-container button {
+    background-color: #4CAF50;
+    border: none;
+    color: white;
+    padding: 10px 20px;
+    text-align: center;
+    text-decoration: none;
+    font-size: 1rem;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+.update-listing-container button:hover {
+    background-color: #45a049;
+}
