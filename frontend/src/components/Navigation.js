@@ -10,7 +10,7 @@ function Navigation() {
     <Box sx={{ flexGrow: 1, padding: '16px', border: 1, justifyContent: 'center'}}>
     <Grid container spacing={2} alignItems="center">
         <Grid item xs={4}>
-            <Typography variant="h6" sx={{ color: '#333' }}>SHARD0x</Typography>
+            <Typography variant="h6" sx={{ color: '#333' }}>FragmentX</Typography>
         </Grid>
         <Grid item xs={4}>
             <Box sx={{ display: 'flex', justifyContent: 'center' }}>

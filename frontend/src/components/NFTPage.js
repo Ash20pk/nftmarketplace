@@ -33,6 +33,8 @@ const NFTPage = () => {
         const metadataIpfsLink = await nftInstance.methods.getURI().call();
         const response = await fetch(metadataIpfsLink);
         const metadata = await response.json();
+        const live = await nftInstance.methods.live().call();
+        setIsLive(live);
         setIpfsLink(metadata.image); 
         setName(nftName);
         setLoading(false);
@@ -48,23 +50,7 @@ const NFTPage = () => {
     };
 
     fetchDetails();
-    fetchLiveStatus();
   }, [connected]);
-
-
-
-    const fetchLiveStatus = async () => {
-        if (connected) {
-            try {
-                const live = await instance.methods.live().call();
-                setIsLive(live);
-            } catch (error) {
-                console.error('Error fetching live status:', error);
-            }
-        }
-    };
-
-
 
   const mintNFT = async () => {
         try {
@@ -86,7 +72,7 @@ const NFTPage = () => {
     }
   };
 
-  console.log(name, ipfsLink, contractAddress);
+  console.log(name, ipfsLink, contractAddress, isLive);
 
   return (
     <Stack sx={{ height: '100vh' }} spacing={3} alignItems="center" justifyContent="center" textAlign= "center">
