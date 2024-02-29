@@ -87,7 +87,7 @@ function Home() {
                     ))}
                 </Grid>
             ) : (
-                <p>No NFT Listed</p>
+                <p>No NFT minted</p>
             )
         ) : (
             <p>Connect your wallet to continue</p>

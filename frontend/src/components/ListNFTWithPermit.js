@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { ethers } from 'ethers';
 import { useWeb3 } from './ConnectWallet'; // Import the useWeb3 hook to access web3 instance and other context variables
 import '../styles/ListNFTWithPermit.css'; // Import CSS file for styling
-import {Button, Stack, TextField, Box, Container} from '@mui/material';
+import {Button, Stack, TextField, Typography} from '@mui/material';
 
 
 function ListNFTWithPermit() {
@@ -97,7 +97,7 @@ function ListNFTWithPermit() {
 
   return (
       <Stack direction="column" spacing={2} justifyContent="center" alignItems="center" sx={{ height: '100vh' }}>
-      <h2>List NFT</h2>
+      <Typography variant="overline" fontSize={20} sx={{margin: 5}}>List your NFT now</Typography>
       <TextField
         type="text"
         placeholder="NFT Address"
