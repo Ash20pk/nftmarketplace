@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useWeb3 } from './ConnectWallet';
-import { Box, Container, Grid, TextField, Button, Stack, Alert, Typography } from '@mui/material';
+import { Box, Container, Grid, TextField, Button, Stack, Alert, Typography, Modal } from '@mui/material';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import { styled } from '@mui/material/styles';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -8,6 +8,8 @@ import IconButton from '@mui/material/IconButton';
 import CircularProgress from '@mui/material/CircularProgress';
 import {uploadWithMetadata} from './UploadIPFS';
 import Confetti from 'react-confetti'
+import CloseIcon from '@mui/icons-material/Close';
+
 
 
 const VisuallyHiddenInput = styled('input')({
@@ -26,6 +28,7 @@ const VisuallyHiddenInput = styled('input')({
 
 function CreateNFT() {
     const { web3js, account, connected, nftFactoryContract } = useWeb3();
+    const [open, setOpen] = useState(true);
     const [createNftData, setCreateNftData] = useState({
         NFTname: '',
         symbol: '',
@@ -33,6 +36,18 @@ function CreateNFT() {
         publicPrice: 0,
         initialTokenSupply: 0,
     });
+    const handleClose = () => {
+        setOpen(false);
+    };
+
+    const handleShare = () => {
+        const contractAddressLink = `${window.location.href}/${contractAddress}`;
+        const courseLink = "https://metaschool.so/courses/build-marketplace-erc404-tokens"
+        const tweetText = encodeURIComponent(`Check out my dope 404 NFT! 🚀 ${contractAddressLink} \n\nP.S. Interested in learning how to build your own ERC404 Marketplace? Enroll in the free course now by @0xmetaschool\n\n ${courseLink}`);
+
+        window.open(`https://twitter.com/intent/tweet?text=${tweetText}`, '_blank');
+        console.log('Sharing to Twitter...');
+    };
     const [contractAddress, setContractAddress] = useState('');
     const [image, setImage] = useState(null);
     const [loading, setLoading] = useState(false);
@@ -158,6 +173,25 @@ function CreateNFT() {
                                 )}
                                 {contractAddress && <Alert severity='success'>Why don't you share with your friends: <a href={`/${contractAddress}`}>Here is link to interact with your NFT</a></Alert>}
                                 {loading && <Alert severity="info">{`${loadingMessage}`}</Alert>}
+
+                                <Modal open={contractAddress} onClose={handleClose}>
+                                <Box height="100%" display="flex" alignItems="center" justifyContent="center" >
+                                    <Container maxWidth="sm" sx={{background: '#fff', border:1, borderRadius: 3}}>
+                                    <IconButton onClick={handleClose} color="primary" sx={{ position: 'absolute', top: '5px', right: '5px' }}>
+                                    <CloseIcon />
+                                    </IconButton>
+                                    <Stack spacing={3} sx={{alignItems:"center", justifyContent:"center", padding:5}}>
+                                    <Typography variant="h6">NFT Minted Successfully</Typography>
+                                    <Box component="img" src={image ? URL.createObjectURL(image) : ''} sx={{ width: '50%', height: '50%', borderRadius: 3, margin: '10px'  }} />
+                                    <Box>
+                                    <Button onClick={handleShare} variant="outlined" color="primary" style={{ marginTop: '20px' }}>
+                                        Share to Twitter
+                                    </Button>
+                                    </Box>
+                                    </Stack>
+                                    </Container>
+                                </Box>
+                            </Modal>
                             </Stack>
                         </Box>
                     </Grid>
