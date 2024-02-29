@@ -15,8 +15,8 @@ contract NFTMintDN404 is DN404, ERC20Permit, Ownable{
     string private _symbol;
     string private _baseURI;
     bytes32 private allowlistRoot;
-    uint120 public publicPrice;
-    uint120 public allowlistPrice;
+    uint256 public publicPrice;
+    uint256 public allowlistPrice;
     bool public live;
     uint256 public numMinted;
     uint256 public MAX_SUPPLY;
@@ -43,20 +43,22 @@ contract NFTMintDN404 is DN404, ERC20Permit, Ownable{
     constructor(
         string memory name_,
         string memory symbol_,
+        string memory uri_,
         uint256 _MAX_SUPPLY,
-        uint120 publicPrice_,
-        uint96 initialTokenSupply,
-        address initialSupplyOwner
+        uint256 publicPrice_,
+        uint256 initialTokenSupply,
+        address _owner
     ) ERC20Permit("ERC404Token") {
-        _initializeOwner(msg.sender);
+        _initializeOwner(_owner);
 
         _name = name_;
         _symbol = symbol_;
         MAX_SUPPLY = _MAX_SUPPLY;
         publicPrice = publicPrice_;
+        _baseURI = uri_;
 
         address mirror = address(new DN404Mirror(msg.sender));
-        _initializeDN404(initialTokenSupply, initialSupplyOwner, mirror);
+        _initializeDN404(initialTokenSupply, _owner, mirror);
     }
 
     function mint(uint256 amount) public payable isValidMint(publicPrice, amount) {
@@ -88,7 +90,7 @@ contract NFTMintDN404 is DN404, ERC20Permit, Ownable{
         _baseURI = baseURI_;
     }
 
-    function setPrices(uint120 publicPrice_, uint120 allowlistPrice_) public onlyOwner {
+    function setPrices(uint256 publicPrice_, uint256 allowlistPrice_) public onlyOwner {
         publicPrice = publicPrice_;
         allowlistPrice = allowlistPrice_;
     }
@@ -124,7 +126,7 @@ contract NFTMintDN404 is DN404, ERC20Permit, Ownable{
         allowlistRoot = allowlistRoot_;
     }
 
-    function setAllowlistPrice(uint120 allowlistPrice_) public onlyOwner {
+    function setAllowlistPrice(uint256 allowlistPrice_) public onlyOwner {
         allowlistPrice = allowlistPrice_;
     }
 

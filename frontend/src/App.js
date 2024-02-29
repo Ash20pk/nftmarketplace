@@ -1,65 +1,25 @@
 import React, { useState } from 'react';
-import ConnectWallet, { useWeb3 } from './components/ConnectWallet';
+import { BrowserRouter as Router, Routes, Route  } from 'react-router-dom';
 import ListNFTWithPermit from './components/ListNFTWithPermit';
-import CancelListing from './components/CancelListing';
-import BuyNFT from './components/BuyNFT';
-import UpdateListingPrice from './components/UpdateListingPrice';
+import CreateNFT from './components/CreateNFT';
+import NFTPage from './components/NFTPage';
 import Navigation from './components/Navigation';
+import Home from './components/Home';
 import './App.css'
 
 function App() {
-  const {nftContract, account, marketplaceContract, web3 } = useWeb3();
-
-  const [listNFTData, setListNFTData] = useState({
-    nftAddress: '',
-    amount: 1,
-    price: '0.0',
-    deadline: 0, 
-    signature: ''
-  });
-  const [cancelListingData, setCancelListingData] = useState({
-    nftAddress: ''
-  });
-  const [buyNFTData, setBuyNFTData] = useState({
-    nftAddress: '',
-    fraction: 1,
-    price: '0.0'
-  });
-  const [updateListingData, setUpdateListingData] = useState({
-    nftAddress: '',
-    newPrice: '0.0'
-  });
 
   return (
-    <div>
-      <Navigation />
-      <div className='account-info'>Account: {account}</div>
-      <ListNFTWithPermit
-        listNFTData={listNFTData}
-        setListNFTData={setListNFTData}
-        nftContract={nftContract}
-        account={account}
-        marketplaceContract={marketplaceContract}
-      />
-      <CancelListing
-        cancelListingData={cancelListingData}
-        setCancelListingData={setCancelListingData}
-        marketplaceContract={marketplaceContract}
-      />
-      <BuyNFT
-        buyNFTData={buyNFTData}
-        setBuyNFTData={setBuyNFTData}
-        account={account}
-        marketplaceContract={marketplaceContract}
-        web3={web3}
-      />
-      <UpdateListingPrice
-        updateListingData={updateListingData}
-        setUpdateListingData={setUpdateListingData}
-        marketplaceContract={marketplaceContract}
-      />
-    </div>
-  );
-}
+    <Router>
+    <Navigation />
+    <Routes>
+      <Route path="/" element={<Home />} />
+      <Route path="/list-nft" element={<ListNFTWithPermit />} />
+      <Route path="/create-nft" element={<CreateNFT />} />
+      <Route path="/:contractAddress" element={<NFTPage />} />
+    </Routes>
+  </Router>
+);
+};
 
 export default App;

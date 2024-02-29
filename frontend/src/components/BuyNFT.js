@@ -1,7 +1,15 @@
-import React from 'react';
+import React, { useState } from 'react';
 import '../styles/BuyNFT.css';
+import { useWeb3 } from './ConnectWallet';
 
-function BuyNFT({ buyNFTData, setBuyNFTData, account, marketplaceContract, web3 }) {
+function BuyNFT() {
+  const {account, marketplaceContract, web3 } = useWeb3();
+
+  const [buyNFTData, setBuyNFTData] = useState({
+    nftAddress: '',
+    fraction: 1,
+    price: '0.0'
+  });
   const buyNFT = async () => {
     try {
       await marketplaceContract.methods.buyItem(
@@ -10,7 +18,7 @@ function BuyNFT({ buyNFTData, setBuyNFTData, account, marketplaceContract, web3 
       )
       .send({ 
         from: account,
-        value: web3.utils.toWei(buyNFTData.price, 'ether') 
+        value: web3js.utils.toWei(buyNFTData.price, 'ether') 
     });
     } catch (error) {
       console.error(error);

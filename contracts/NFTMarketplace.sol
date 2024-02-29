@@ -4,6 +4,7 @@ pragma solidity ^0.8.20;
 import "./Interface/IDN404.sol";
 import "@openzeppelin/contracts/utils/Context.sol";
 
+
 error PriceNotMet(address nftAddress, uint256 price);
 error ItemNotForSale(address nftAddress);
 error NotListed(address nftAddress);
@@ -17,10 +18,12 @@ error NotApproved();
 contract NFTMarketplace is Context {
 
     uint256 private counter;
+    address[] public allNFTs;
 
     struct Listing {
         uint256 price;
         address seller;
+        uint256 amount;
     }
 
     event LogItemListed(
@@ -41,23 +44,27 @@ contract NFTMarketplace is Context {
         uint256 fraction
     );
 
+    event LogItemUpdated(
+        address indexed buyer,
+        address indexed nftAddress,
+        uint256 price
+    );
+
     // State Variables
     mapping(address => Listing) private s_listings;
     mapping(address => uint256) private s_proceeds;
 
+    modifier alreadyListed(address nftAddress) {
+        Listing memory listing = s_listings[nftAddress];
+        require(listing.price == 0, "Already Listed");
+        _;
+    }
 
-    // Function modifiers
     modifier isListed(address nftAddress) {
         Listing memory listing = s_listings[nftAddress];
-        require(listing.price > 0, "Not listed");
+        require(listing.price > 0, "Not Listed");
         _;
-    }
-
-    modifier notListed(address nftAddress) {
-        Listing memory listing = s_listings[nftAddress];
-        require(listing.price == 0, "Already listed");
-        _;
-    }
+    }    
 
     modifier isOwner(address nftAddress, address spender) {
         IDN404 nft = IDN404(nftAddress);
@@ -73,18 +80,24 @@ contract NFTMarketplace is Context {
         uint256 deadline,
         uint256 price,
         uint8 v, bytes32 r, bytes32 s   
-        ) external notListed(nftAddress) {
-            
+        ) external alreadyListed(nftAddress) {
+        
+        //Interface to interact with the NFT contract
         IDN404 nft = IDN404(nftAddress);
 
-        nft.permit(owner, spender, amount, deadline, v, r, s);
+        //Call the NFT contract and pass the singature to verify and allow the NFT contract to spend on behalf of the user
+        nft.permit(owner, spender, amount, deadline, v, r, s); //Signature follows the EIP-712 standard
 
+        //Check if the NFT contract have the allowance to spend on behalf of the user, if not then revert
         if(nft.allowance(owner, spender) < amount){
             revert NotApproved();
         }
 
         // Store the listing information
-        s_listings[nftAddress] = Listing(price, _msgSender());
+        s_listings[nftAddress] = Listing(price, _msgSender(), amount);
+
+        // Add NFT address to allNFTs array
+        allNFTs.push(nftAddress);
 
         // Emit event
         emit LogItemListed(_msgSender(), nftAddress, price);
@@ -109,6 +122,8 @@ contract NFTMarketplace is Context {
         Listing memory listedItem = s_listings[nftAddress];
         require(msg.value >= listedItem.price, "Price not met");
 
+        s_listings[nftAddress].amount -= fraction;
+
         s_proceeds[listedItem.seller] += msg.value;
         delete s_listings[nftAddress];
         IDN404(nftAddress).transferFrom(listedItem.seller, _msgSender(), fraction);
@@ -117,16 +132,40 @@ contract NFTMarketplace is Context {
 
     function updateListing(
         address nftAddress,
-        uint256 newPrice
+        uint256 newPrice,
+        uint256 amount,
+        uint256 deadline,
+        uint8 v,
+        bytes32 r,
+        bytes32 s 
     )
         external
-        isListed(nftAddress)
         isOwner(nftAddress, _msgSender())
+        isListed(nftAddress)
     {
+        uint256 balance = userWalletBalance(_msgSender(), nftAddress);
+
+        require(amount <= balance, "You don't hold enough");
         require(newPrice > 0, "Price must be above zero");
 
-        s_listings[nftAddress].price = newPrice;
-        emit LogItemListed(_msgSender(), nftAddress, newPrice);
+        Listing storage listing = s_listings[nftAddress];
+
+        if(IDN404(nftAddress).allowance(_msgSender(), address(this)) < amount){
+            IDN404(nftAddress).permit(_msgSender(), address(this), amount, deadline, v, r, s);
+        }
+
+        listing.price = newPrice;
+        listing.amount = amount;
+
+        emit LogItemUpdated(_msgSender(), nftAddress, newPrice);
+    }
+
+    function allListings() public view returns(address[] memory){
+        return allNFTs;
+    }
+
+    function userWalletBalance(address owner, address nftAddress) internal view returns(uint256){
+        return IDN404(nftAddress).balanceOf(owner);
     }
 
     function withdrawProceeds() external {

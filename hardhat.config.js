@@ -21,12 +21,26 @@ module.exports = {
       hardfork: "berlin",
     },
     mumbai: {
-      url: "https://rpc.ankr.com/polygon_mumbai",
+      url: "https://polygon-mumbai-pokt.nodies.app",
       accounts: privateKey(),
+    },
+    berachainTestnet: {
+      chainId: 80085,
+      url: "https://artio.rpc.berachain.com/",
+      accounts: process.env.PRIVATE_KEY
+        ? [`${process.env.PRIVATE_KEY}`]
+        : [],
     }
   },
-  solidity: "0.8.20",
-  etherscan: {
+  solidity: {
+    version: "0.8.20",
+    settings: {
+      optimizer: {
+        enabled: true,
+        runs: 1000,
+      },
+    },
+  },  etherscan: {
     apiKey: "S1VXKDQCP4P2VXAK9Q8B46K71TFP9WF692",
   },
 };

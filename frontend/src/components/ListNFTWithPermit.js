@@ -1,11 +1,21 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { ethers } from 'ethers';
 import { useWeb3 } from './ConnectWallet'; // Import the useWeb3 hook to access web3 instance and other context variables
 import '../styles/ListNFTWithPermit.css'; // Import CSS file for styling
+import {Button, Stack, TextField, Box, Container} from '@mui/material';
 
 
-function ListNFTWithPermit({ listNFTData, setListNFTData }) {
-  const { web3, account, marketplaceContract, nftContract, marketplaceAddress, nftContractAddress } = useWeb3(); // Destructure variables from the Web3 context
+function ListNFTWithPermit() {
+  const { web3js, account, marketplaceContract, nftContract, marketplaceAddress, nftContractAddress } = useWeb3(); // Destructure variables from the Web3 context
+
+  const [listNFTData, setListNFTData] = useState({
+    nftAddress: '',
+    amount: '',
+    price: '',
+    deadline: 0, 
+    signature: ''
+  });
+  console.log(listNFTData.nftAddress);
 
   const getTimestampInSeconds = () => {
     // returns current timestamp in seconds
@@ -15,7 +25,7 @@ function ListNFTWithPermit({ listNFTData, setListNFTData }) {
   const listNFTWithPermit = async () => {
     try {
         console.log(account, marketplaceAddress, nftContractAddress)
-      const priceInWei = web3.utils.toWei(listNFTData.price, 'ether');
+      const priceInWei = web3js.utils.toWei(listNFTData.price, 'ether');
       const deadline = getTimestampInSeconds() + 84200;
       const nonces = await nftContract.methods.nonces(account).call();
 
@@ -56,7 +66,7 @@ function ListNFTWithPermit({ listNFTData, setListNFTData }) {
 
       // Sign the message data
       const signature = await new Promise((resolve, reject) => {
-        web3.currentProvider.sendAsync(
+        web3js.currentProvider.sendAsync(
           {
             method: "eth_signTypedData_v4",
             params: [account, msgData],
@@ -86,28 +96,28 @@ function ListNFTWithPermit({ listNFTData, setListNFTData }) {
   };
 
   return (
-    <div className="list-nft-container">
+      <Stack direction="column" spacing={2} justifyContent="center" alignItems="center" sx={{ height: '100vh' }}>
       <h2>List NFT</h2>
-      <input
+      <TextField
         type="text"
         placeholder="NFT Address"
         value={listNFTData.nftAddress}
         onChange={(e) => setListNFTData({ ...listNFTData, nftAddress: e.target.value })}
       />
-      <input
+      <TextField
         type="number"
         placeholder="Amount"
         value={listNFTData.amount}
         onChange={(e) => setListNFTData({ ...listNFTData, amount: parseInt(e.target.value) })}
       />
-      <input
+      <TextField
         type="text"
         placeholder="Price"
         value={listNFTData.price}
         onChange={(e) => setListNFTData({ ...listNFTData, price: e.target.value })}
       />
-      <button onClick={listNFTWithPermit}>List NFT with Permit</button>
-    </div>
+      <Button variant="contained" onClick={listNFTWithPermit}>List NFT</Button>
+      </Stack>
   );
 }
 

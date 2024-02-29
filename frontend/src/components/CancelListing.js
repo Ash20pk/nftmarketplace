@@ -1,7 +1,15 @@
-import React from 'react';
+import React, { useState } from 'react';
 import '../styles/CancelListing.css';
+import { useWeb3 } from './ConnectWallet';
 
-function CancelListing({ cancelListingData, setCancelListingData, marketplaceContract }) {
+
+function CancelListing() {
+  const {marketplaceContract } = useWeb3();
+
+
+  const [cancelListingData, setCancelListingData] = useState({
+    nftAddress: ''
+  });
   const cancelListing = async () => {
     try {
       await marketplaceContract.methods.cancelListing(cancelListingData.nftAddress);

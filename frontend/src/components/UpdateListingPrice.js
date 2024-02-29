@@ -1,9 +1,16 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { ethers } from 'ethers';
 import '../styles/UpdateListingPrice.css';
+import { useWeb3 } from './ConnectWallet';
 
 
-function UpdateListingPrice({ updateListingData, setUpdateListingData, marketplaceContract }) {
+function UpdateListingPrice() {
+  const {marketplaceContract } = useWeb3();
+    const [updateListingData, setUpdateListingData] = useState({
+      nftAddress: '',
+      newPrice: '0.0'
+    });
+
   const updateListingPrice = async () => {
     try {
       await marketplaceContract.methods.updateListing(
