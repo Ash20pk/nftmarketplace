@@ -70,7 +70,7 @@ function Home() {
                 <Grid container spacing={2}>
                     {nftListings.map((listing, index) => (
                         <Grid item xs={12} sm={6} md={4} key={index}>
-                            <Link href={`http://localhost:3001/${listing.nftAddress}`} style={{ textDecoration: 'none', color: 'inherit' }}>
+                            <Link href={`https://nftmarketplace-a.vercel.app/${listing.nftAddress}`} style={{ textDecoration: 'none', color: 'inherit' }}>
                                 <Card sx={{ '&:hover': { boxShadow: '0px 0px 10px 0px rgba(0,0,0,0.3)', cursor: 'pointer' } }}>
                                     <CardMedia
                                         component="img"
