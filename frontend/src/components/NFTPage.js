@@ -75,7 +75,7 @@ const NFTPage = () => {
   console.log(name, ipfsLink, contractAddress, isLive);
 
   return (
-    <Stack sx={{ height: '100vh' }} spacing={3} alignItems="center" justifyContent="center" textAlign= "center">
+    <Stack sx={{ height: '80vh' }} spacing={3} alignItems="center" justifyContent="center" textAlign= "center">
         <Typography variant="overline" fontSize={20} sx={{margin: 5}}>Mint your {name} NFT now</Typography>
           <Box sx={{height: '30rem', border: '1px dashed grey', borderRadius:3, width: '30rem', position: 'relative', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
           {connected ? (
@@ -115,7 +115,7 @@ const NFTPage = () => {
                   {message && <Alert security='success'>{message}</Alert>}
                 </Stack>
             </Box>
-            <Typography variant="overline">Want to create your own ERC404 NFT? <a href=''>click here</a> 🔥</Typography>
+            <Typography variant="overline">Want to create your own ERC404 NFT? <a href='https://nftmarketplace-a.vercel.app/create-nft'>click here</a> 🔥</Typography>
     </Stack>
   );
               }

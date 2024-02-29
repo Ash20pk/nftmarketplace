@@ -9,6 +9,7 @@ import CircularProgress from '@mui/material/CircularProgress';
 import {uploadWithMetadata} from './UploadIPFS';
 import Confetti from 'react-confetti'
 import CloseIcon from '@mui/icons-material/Close';
+import NFTMintDN404 from '../contracts/NFTMintDN404.json'
 
 
 
@@ -41,7 +42,7 @@ function CreateNFT() {
     };
 
     const handleShare = () => {
-        const contractAddressLink = `${window.location.href}/${contractAddress}`;
+        const contractAddressLink = `https://nftmarketplace-a.vercel.app/${contractAddress}`;
         const courseLink = "https://metaschool.so/courses/build-marketplace-erc404-tokens"
         const tweetText = encodeURIComponent(`Check out my dope 404 NFT! 🚀 ${contractAddressLink} \n\nP.S. Interested in learning how to build your own ERC404 Marketplace? Enroll in the free course now by @0xmetaschool\n\n ${courseLink}`);
 
@@ -89,6 +90,8 @@ function CreateNFT() {
         // Get the latest contract address after creation
         const userContracts = await nftFactoryContract.methods.getUserContracts(account).call();
         const latest = userContracts.length > 0 ? userContracts[userContracts.length - 1] : '';
+        const nftInstance = new web3js.eth.Contract(NFTMintDN404.abi, latest);
+        await nftInstance.methods.toggleLive().call({from: account})
         setLoadingMessage("yayyyyy congrats on minting your first ERC404 NFT 🔥");
         setContractAddress(latest);
         setLoading(false);
@@ -175,7 +178,7 @@ function CreateNFT() {
                                 ) : (
                                     <Alert severity="error">Wallet not connected</Alert>
                                 )}
-                                {contractAddress && <Alert severity='success'>Why don't you share with your friends: <a href={`/${contractAddress}`}>Here is link to interact with your NFT</a></Alert>}
+                                {contractAddress && <Alert severity='success'>Why don't you share with your friends: <a href={`https://nftmarketplace-a.vercel.app/${contractAddress}`}>Here is link to interact with your NFT</a></Alert>}
                                 {loading && <Alert severity="info">{`${loadingMessage}`}</Alert>}
 
                                 <Modal open={contractAddress} onClose={handleClose}>
