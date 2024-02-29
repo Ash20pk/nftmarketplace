@@ -22,18 +22,18 @@ const NFTPage = () => {
   
   useEffect(() => {
     // Fetch details using contract address
-    console.log(contractAddress);
     const fetchDetails = async () => {
       try {
         if(connected){
         setLoading(true);
         setError(null);
-        await window.ethereum.request({ method: "eth_requestAccounts" });
         const nftInstance = new web3js.eth.Contract(NFTMintDN404.abi, contractAddress);
         setInstance(nftInstance);
         const nftName = await nftInstance.methods.name().call();
         const metadataIpfsLink = await nftInstance.methods.getURI().call();
-        await fetchMetadata(metadataIpfsLink);
+        const response = await fetch(metadataIpfsLink);
+        const metadata = await response.json();
+        setIpfsLink(metadata.image); 
         setName(nftName);
         setLoading(false);
         }
@@ -48,9 +48,11 @@ const NFTPage = () => {
     };
 
     fetchDetails();
-  }, [contractAddress, account]);
+    fetchLiveStatus();
+  }, [connected]);
 
-  useEffect(() => {
+
+
     const fetchLiveStatus = async () => {
         if (connected) {
             try {
@@ -62,8 +64,7 @@ const NFTPage = () => {
         }
     };
 
-    fetchLiveStatus();
-}, [isLive]);
+
 
   const mintNFT = async () => {
         try {
@@ -76,12 +77,6 @@ const NFTPage = () => {
             console.error('Error minting', error);
         }
     };
-
-  const fetchMetadata = async(metadataUrl) => {
-    const response = await fetch(metadataUrl);
-    const metadata = await response.json();
-    setIpfsLink(metadata.image); 
-  }
 
   const toggleLive = async () => {
     try {
@@ -97,14 +92,14 @@ const NFTPage = () => {
     <Stack sx={{ height: '100vh' }} spacing={3} alignItems="center" justifyContent="center" textAlign= "center">
         <Typography variant="overline" fontSize={20} sx={{margin: 5}}>Mint your {name} NFT now</Typography>
           <Box sx={{height: '30rem', border: '1px dashed grey', borderRadius:3, width: '30rem', position: 'relative', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
-           {loading ? (
-                <CircularProgress />  
-            ) : error ? (
-                <Alert severity="error">{error}</Alert>  
+          {connected ? (
+                loading ? (
+                    <CircularProgress />  
+                ) : (
+                    <Box component="img" src={ipfsLink} sx={{ height: '100%', width: '100%', borderRadius: 3}} />
+                )
             ) : (
-                <>
-                <Box component="img" src={ipfsLink} sx={{ height: '100%', width: '100%', borderRadius: 3}} />
-                </>
+                <Alert severity="error">Wallet not connected</Alert>
             )}
             </Box >
             <Box sx={{ justifyContent: "center", alignItems: "center", margin: 2, display: 'flex'}}>

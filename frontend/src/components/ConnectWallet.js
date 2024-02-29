@@ -70,7 +70,7 @@ function ConnectWallet({ children }) {
   };
 
   return (
-    <Web3Context.Provider value={{ web3js, signer, nftContract, account, marketplaceContract, marketplaceAddress, nftContractAddress, disconnectWallet, connectWallet, nftFactoryContract, connected }}>
+    <Web3Context.Provider value={{ web3js, signer, nftContract, account, marketplaceContract, marketplaceAddress, nftContractAddress, disconnectWallet, connectWallet, nftFactoryContract, connected, setConnected }}>
       <div>
         {children}
       </div>

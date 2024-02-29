@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useWeb3 } from './ConnectWallet';
 import { Box, Container, Grid, TextField, Button, Stack, Alert, Typography, Modal } from '@mui/material';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
@@ -65,6 +65,11 @@ function CreateNFT() {
         setImage(e.target.files[0]);
     }
 
+    useEffect(() => {
+        // Fetch details using contract address
+        console.log("connected", connected);
+    },[connected]);
+
     const createNFT = async () => {
         setLoading(true);
         setLoadingMessage("Let's first upload your cool image to IPFS");
@@ -89,7 +94,6 @@ function CreateNFT() {
         setLoading(false);
         console.log(userContracts, latest);
     };
-
     return (    
     <Box sx={{ justifyContent: "center", alignContent: "center", textAlign: "center" }}>
        {contractAddress && <Confetti/>}
