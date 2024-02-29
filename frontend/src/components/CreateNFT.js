@@ -9,7 +9,6 @@ import CircularProgress from '@mui/material/CircularProgress';
 import {uploadWithMetadata} from './UploadIPFS';
 import Confetti from 'react-confetti'
 import CloseIcon from '@mui/icons-material/Close';
-import NFTMintDN404 from '../contracts/NFTMintDN404.json'
 
 
 
@@ -29,7 +28,7 @@ const VisuallyHiddenInput = styled('input')({
 
 function CreateNFT() {
     const { web3js, account, connected, nftFactoryContract } = useWeb3();
-    const [open, setOpen] = useState(true);
+    const [open, setOpen] = useState(false);
     const [createNftData, setCreateNftData] = useState({
         NFTname: '',
         symbol: '',
@@ -66,10 +65,6 @@ function CreateNFT() {
         setImage(e.target.files[0]);
     }
 
-    useEffect(() => {
-        // Fetch details using contract address
-        console.log("connected", connected);
-    },[connected]);
 
     const createNFT = async () => {
         setLoading(true);
@@ -90,11 +85,10 @@ function CreateNFT() {
         // Get the latest contract address after creation
         const userContracts = await nftFactoryContract.methods.getUserContracts(account).call();
         const latest = userContracts.length > 0 ? userContracts[userContracts.length - 1] : '';
-        const nftInstance = new web3js.eth.Contract(NFTMintDN404.abi, latest);
-        await nftInstance.methods.toggleLive().call({from: account})
         setLoadingMessage("yayyyyy congrats on minting your first ERC404 NFT 🔥");
         setContractAddress(latest);
         setLoading(false);
+        setOpen(true);
         console.log(userContracts, latest);
     };
     return (    
@@ -181,7 +175,7 @@ function CreateNFT() {
                                 {contractAddress && <Alert severity='success'>Why don't you share with your friends: <a href={`https://nftmarketplace-a.vercel.app/${contractAddress}`}>Here is link to interact with your NFT</a></Alert>}
                                 {loading && <Alert severity="info">{`${loadingMessage}`}</Alert>}
 
-                                <Modal open={contractAddress} onClose={handleClose}>
+                                <Modal open={open} onClose={handleClose}>
                                 <Box height="100%" display="flex" alignItems="center" justifyContent="center" >
                                     <Container maxWidth="sm" sx={{background: '#fff', border:1, borderRadius: 3}}>
                                     <IconButton onClick={handleClose} color="primary" sx={{ position: 'absolute', top: '5px', right: '5px' }}>

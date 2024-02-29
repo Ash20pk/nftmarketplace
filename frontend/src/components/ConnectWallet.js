@@ -21,7 +21,7 @@ function ConnectWallet({ children }) {
 
   const marketplaceAddress = "0x869d1961443120A53D66923ccBac81eee40d913B";
   const nftContractAddress = "0xd8E46D75B5f4b450534acA1804f1CfcbeDEA3772";
-  const nftfactoryAddress = "0x2B67aaCb0abeD2a7164150939DAf331C7031ED64";
+  const nftfactoryAddress = "0xF19951BbcF4AFCa8eb0299Af2Ae2BfdB0a066A3B";
 
   useEffect(() => {
     if (window.ethereum) {

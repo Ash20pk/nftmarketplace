@@ -56,6 +56,7 @@ contract NFTMintDN404 is DN404, ERC20Permit, Ownable{
         MAX_SUPPLY = _MAX_SUPPLY;
         publicPrice = publicPrice_;
         _baseURI = uri_;
+        live = true;
 
         address mirror = address(new DN404Mirror(msg.sender));
         _initializeDN404(initialTokenSupply, _owner, mirror);
