@@ -1,14 +1,14 @@
 // index.js
-import React from 'react';
-import ReactDOM from 'react-dom';
+import { StrictMode } from 'react';
+import { render } from 'react-dom';
 import App from './App';
 import ConnectWallet from './components/ConnectWallet';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 
+const rootElement = document.getElementById('root');
 
-const root = ReactDOM.createRoot(document.getElementById("root"));
-const darkTheme = createTheme({
+const Theme = createTheme({
   palette: {
     primary: {
       main: '#FF5733',
@@ -25,13 +25,14 @@ const darkTheme = createTheme({
 }
 });
 
-root.render(
-  <React.StrictMode>
-    <ThemeProvider theme={darkTheme}>
-      <CssBaseline />
+render(
+	<StrictMode>
+  <ThemeProvider theme={Theme}>
+    <CssBaseline />
     <ConnectWallet>
       <App />
     </ConnectWallet>
-    </ThemeProvider>
-  </React.StrictMode>
+  </ThemeProvider>
+  </StrictMode>,
+	rootElement
 );
