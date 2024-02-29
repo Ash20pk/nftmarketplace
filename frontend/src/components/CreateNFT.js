@@ -43,7 +43,7 @@ function CreateNFT() {
     const handleShare = () => {
         const contractAddressLink = `https://nftmarketplace-a.vercel.app/${contractAddress}`;
         const courseLink = "https://metaschool.so/courses/build-marketplace-erc404-tokens"
-        const tweetText = encodeURIComponent(`Check out my dope 404 NFT! 🚀 ${contractAddressLink} \n\nP.S. Interested in learning how to build your own ERC404 Marketplace? Enroll in the free course now by @0xmetaschool\n\n ${courseLink}`);
+        const tweetText = encodeURIComponent(`Check out my freshly-minted ERC-404 NFT! 🚀 ${contractAddressLink} \nAlso, you can now build your own ERC-404 marketplace. Here is how:\n ${courseLink}`);
 
         window.open(`https://twitter.com/intent/tweet?text=${tweetText}`, '_blank');
         console.log('Sharing to Twitter...');
