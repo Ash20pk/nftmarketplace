@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import "./Token.sol";
+import "./NFTMintDN404.sol";
 
 contract TokenFactory {
     address[] public contractAddresses;
@@ -16,10 +16,9 @@ contract TokenFactory {
         string memory uri_,
         uint256 max_supply,
         uint256 publicPrice,
-        uint256 initialTokenSupply,
-        address _owner
+        uint256 initialTokenSupply
     ) external {
-        NFTMintDN404 newContract = new NFTMintDN404(name, symbol, uri_, max_supply, publicPrice, initialTokenSupply, _owner);
+        NFTMintDN404 newContract = new NFTMintDN404(name, symbol, uri_, max_supply, publicPrice, initialTokenSupply);
         address contractAddress = address(newContract);
         contractAddresses.push(contractAddress);
         totalMinted++;

@@ -46,10 +46,10 @@ contract NFTMintDN404 is DN404, ERC20Permit, Ownable{
         string memory uri_,
         uint256 _MAX_SUPPLY,
         uint256 publicPrice_,
-        uint256 initialTokenSupply,
-        address _owner
+        uint256 initialTokenSupply
+        // address _owner
     ) ERC20Permit("ERC404Token") {
-        _initializeOwner(_owner);
+        _initializeOwner(msg.sender);
 
         _name = name_;
         _symbol = symbol_;
@@ -59,7 +59,7 @@ contract NFTMintDN404 is DN404, ERC20Permit, Ownable{
         live = true;
 
         address mirror = address(new DN404Mirror(msg.sender));
-        _initializeDN404(initialTokenSupply, _owner, mirror);
+        _initializeDN404(initialTokenSupply, msg.sender, mirror);
     }
 
     function mint(uint256 amount) public payable isValidMint(publicPrice, amount) {
